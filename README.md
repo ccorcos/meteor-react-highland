@@ -2,6 +2,8 @@
 
 This package is an experiment using [Highland](http://highlandjs.org/) and [Metoer](https://www.meteor.com/) to reactively render with [React](https://facebook.github.io/react/). [Check out the example](/examples/search/main.coffee)!
 
+    meteor add ccorcos:react-highland
+
 ### Motivation
 
 The one thing I didn't like about React is that I found myself passing functions between components all of the time. When I started experimenting more with [React for Meteor](https://github.com/ccorcos/meteor-react-utils), I realized that Meteor's `ReactiveVar`s can help to aleviate this pain. But eventually, I hit some frustrations. I had a search query in a `ReactiveVar` that I wanted to debounce before creating a Meteor subscription. This could be done with another `ReactiveVar` but I recalled a more elegant solution with observable streams that I learned from [Jafar Husain's Netflix Javascript talk](https://www.youtube.com/watch?v=XRYN2xt11Ek). Long story short, this package is a result of trying to integrate React and Meteor using the Highland.js observable streams library.
