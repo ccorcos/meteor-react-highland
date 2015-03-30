@@ -177,3 +177,7 @@ _.route('/post/:postId', function(params, queryParams) {
   React.render(x, document.body)
 })
 ```
+
+#### Acknowledgements
+
+Thanks to @vqvu for all the help with Highland.js.
