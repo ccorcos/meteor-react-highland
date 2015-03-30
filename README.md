@@ -180,4 +180,4 @@ _.route('/post/:postId', function(params, queryParams) {
 
 #### Acknowledgements
 
-Thanks to @vqvu for all the help with Highland.js.
+Thanks to [vqvu](https://github.com/vqvu) for all the help with Highland.js.
