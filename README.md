@@ -6,7 +6,56 @@ This package is an experiment using [Highland](http://highlandjs.org/) and [Meto
 
 ### Motivation
 
-The one thing I didn't like about React is that I found myself passing functions between components all of the time. When I started experimenting more with [React for Meteor](https://github.com/ccorcos/meteor-react-utils), I realized that Meteor's `ReactiveVar`s can help to aleviate this pain. But eventually, I hit some frustrations. I had a search query in a `ReactiveVar` that I wanted to debounce before creating a Meteor subscription. This could be done with another `ReactiveVar` but I recalled a more elegant solution with observable streams that I learned from [Jafar Husain's Netflix Javascript talk](https://www.youtube.com/watch?v=XRYN2xt11Ek). Long story short, this package is a result of trying to integrate React and Meteor using the Highland.js observable streams library.
+The one thing I didn't like about React is that I found myself passing functions between components all of the time. When I started experimenting more with [React for Meteor](https://github.com/ccorcos/meteor-react-utils), I realized that Meteor's `ReactiveVar`s can help to aleviate this pain. But eventually, I hit some frustrations. I had a search query in a `ReactiveVar` that I wanted to debounce before creating a Meteor subscription. This could be done with another `ReactiveVar` but I recalled a more elegant solution with observable streams that I learned from [Jafar Husain's Netflix Javascript talk](https://www.youtube.com/watch?v=XRYN2xt11Ek). 
+
+Long story short, this package is a result of trying to integrate React and Meteor using the Highland.js observable streams library. I'm pretty happy with the result. The following creates a stream of search queries from a ["controlled input"](https://facebook.github.io/react/docs/forms.html) and displays the results. 
+
+
+```coffee
+search = _()
+_.route '/', (params, queryParams) ->
+    (div {},
+      (search.fork().map (x) ->
+        (input {
+          value: x,
+          placeholder:'Search', 
+          onChange: (e) -> 
+            search.write(e.target.value)
+        })
+      )
+      (div {},
+        (search.fork()
+          .debounce(500)
+          .through _.filterRepeats
+          .through _.subscribe (query) ->
+            if query.length >= 1
+              Meteor.subscribe('search', query, 20)
+          .through _.multi _.map, (query, ready) ->
+            if query.length < 1
+              false
+            else if not ready
+              (div {}, "loading...")
+            else
+              _.autorunStream ->
+                filter = new RegExp(query, 'ig')
+                posts = Posts.find({title:filter}, {sort: {name: 1, date: -1}, limit: 20}).fetch()
+                (div {}, 
+                  do ->
+                    p = posts.map (post) ->
+                      (div {key:post._id}, post.title)
+                    if p.length is 0
+                      return "No results for '#{query}'"
+                    else
+                      return p
+                )
+          .through _.switchOnNext
+        )
+      )
+    )
+  .each (x) ->
+    React.render(x, document.body)
+    search.write('')
+```
 
 ## Highland + React
 
