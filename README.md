@@ -38,7 +38,15 @@ _.route '/', (params, queryParams) ->
             else
               _.autorunStream ->
                 filter = new RegExp(query, 'ig')
-                posts = Posts.find({title:filter}, {sort: {name: 1, date: -1}, limit: 20}).fetch()
+                posts = Posts.find({
+                  title:filter
+                }, {
+                  sort: {
+                    name: 1, 
+                    date: -1
+                  }, 
+                  limit: 20
+                }).fetch()
                 (div {}, 
                   do ->
                     p = posts.map (post) ->
